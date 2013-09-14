@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: mongodb
-# Recipe:: replicatset
+# Recipe:: replicaset
 #
 # Copyright 2011, edelight GmbH
 #
@@ -29,6 +29,5 @@ if !node.recipe?("mongodb::shard")
     replicaset   node
     enable_rest  node['mongodb']['enable_rest']
     smallfiles   node['mongodb']['smallfiles']
-    auth         node['mongodb']['auth']
   end
 end

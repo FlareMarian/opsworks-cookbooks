@@ -24,11 +24,32 @@ package node[:mongodb][:package_name] do
   version node[:mongodb][:package_version]
 end
 
-#chef_gem 'bson_ext'
-#chef_gem 'mongo'
+needs_mongo_gem = (node.recipes.include?("mongodb::replicaset") or node.recipes.include?("mongodb::mongos"))
 
-OpsWorks::InternalGems.internal_gem_package('bson_ext')
-OpsWorks::InternalGems.internal_gem_package('mongo')
+# install the mongo ruby gem at compile time to make it globally available
+if needs_mongo_gem
+  if(Gem.const_defined?("Version") and Gem::Version.new(Chef::VERSION) < Gem::Version.new('10.12.0'))
+    gem_package 'mongo' do
+      action :nothing
+    end.run_action(:install)
+    Gem.clear_paths
+  else
+    chef_gem 'mongo' do
+      action :install
+    end
+  end
+end
+
+# Create keyFile if specified
+if node[:mongodb][:key_file]
+  file "/etc/mongodb.key" do
+    owner node[:mongodb][:user]
+    group node[:mongodb][:group]
+    mode  "0600"
+    backup false
+    content node[:mongodb][:key_file]
+  end
+end
 
 
 if node.recipe?("mongodb::default") or node.recipe?("mongodb")
@@ -41,6 +62,5 @@ if node.recipe?("mongodb::default") or node.recipe?("mongodb")
     dbpath       node['mongodb']['dbpath']
     enable_rest  node['mongodb']['enable_rest']
     smallfiles   node['mongodb']['smallfiles']
-    auth         node['mongodb']['auth']
   end
 end

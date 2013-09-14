@@ -19,11 +19,10 @@
 # limitations under the License.
 #
 
-define :mongodb_instance, :mongodb_type => "mongod",
-       :action => [:enable, :start], :bind_ip => nil, :port => 27017, 
-       :logpath => "/var/log/mongodb", :dbpath => "/data",
-       :configserver => [], :replicaset => nil, :enable_rest => false,
-       :smallfiles => false, :notifies => [], :auth => false do
+define :mongodb_instance, :mongodb_type => "mongod" , :action => [:enable, :start],
+    :bind_ip => nil, :port => 27017 , :logpath => "/var/log/mongodb",
+    :dbpath => "/data", :configserver => [],
+    :replicaset => nil, :enable_rest => false, :smallfiles => false, :notifies => [] do
     
   include_recipe "mongodb::default"
   
@@ -42,8 +41,6 @@ define :mongodb_instance, :mongodb_type => "mongod",
   
   configfile = node['mongodb']['configfile']
   configserver_nodes = params[:configserver]
-
-  auth = params[:auth]
   
   replicaset = params[:replicaset]
 
@@ -72,7 +69,7 @@ define :mongodb_instance, :mongodb_type => "mongod",
       end
     end
   end
- 
+  
   if !["mongod", "shard", "configserver", "mongos"].include?(type)
     raise "Unknown mongodb type '#{type}'"
   end
@@ -85,36 +82,7 @@ define :mongodb_instance, :mongodb_type => "mongod",
     dbpath = nil
     configserver = configserver_nodes.collect{|n| "#{n['fqdn']}:#{n['mongodb']['port']}" }.join(",")
   end
-
-  if replicaset_name and node['mongodb']['keyfile']
-    keyfile = "/etc/mongodb/#{replicaset_name}-keyfile"
-
-    directory "/etc/mongodb" do
-      group node['mongodb']['root_group']
-      owner "root"
-      mode "0755"
-      action :create
-    end
-
-    unless node['mongodb']['keyfile']
-      Chef::Application.fatal!("You must set the keyfile contents to enable auth and replication!")
-    end
-
-    template keyfile do 
-      action :create
-      source "mongodb.keyfile.erb"
-      group node['mongodb']['root_group']
-      owner "root"
-      mode "0644"
-    end
-  end
-
-  # service
-  service name do
-    supports :status => true, :restart => true
-    action :nothing
-  end
- 
+  
   # default file
   template "#{node['mongodb']['defaults_dir']}/#{name}" do
     action :create
@@ -137,13 +105,11 @@ define :mongodb_instance, :mongodb_type => "mongod",
       "shardsrv" => false,  #type == "shard", dito.
       "nojournal" => nojournal,
       "enable_rest" => params[:enable_rest],
-      "smallfiles" => params[:smallfiles],
-      "auth" => auth
+      "smallfiles" => params[:smallfiles]
     )
-    #notifies :restart, "service[#{name}]"
-    notifies :restart, resources(:service => name)
+    notifies :restart, "service[#{name}]"
   end
-
+  
   # log dir [make sure it exists]
   directory logpath do
     owner node[:mongodb][:user]
@@ -163,7 +129,7 @@ define :mongodb_instance, :mongodb_type => "mongod",
       recursive true
     end
   end
-
+  
   # init script
   template "#{node['mongodb']['init_dir']}/#{name}" do
     action :create
@@ -173,43 +139,18 @@ define :mongodb_instance, :mongodb_type => "mongod",
     owner "root"
     mode "0755"
     variables :provides => name
-    #notifies :restart, "service[#{name}]"
-    notifies :restart, resources(:service => name)
+    notifies :restart, "service[#{name}]"
   end
   
-  # replicaset
-  if !replicaset_name.nil? && node['mongodb']['auto_configure']['replicaset']
-    if Chef::Config[:solo]
-      rs_nodes = [node]
-    else
-      rs_nodes = search(
-        :node,
-        "mongodb_cluster_name:#{replicaset['mongodb']['cluster_name']} AND \
-         mongodb_shard_name:#{replicaset['mongodb']['shard_name']} AND \
-         chef_environment:#{replicaset.chef_environment}"
-      )
-    end
-  
-    ruby_block "config_replicaset" do
-      block do
-        if not replicaset.nil?
-          Chef::MongoDB.configure_replicaset(replicaset, replicaset_name, rs_nodes)
-        end
-      end
-      action :nothing
-    end
-  end
-
   # service
   service name do
-    #supports :status => true, :restart => true
+    supports :status => true, :restart => true
     action service_action
     service_notifies.each do |service_notify|
       notifies :run, service_notify
     end
     if !replicaset_name.nil? && node['mongodb']['auto_configure']['replicaset']
-      #notifies :create, "ruby_block[config_replicaset]"
-      notifies :create, resources(:ruby_block => "config_replicaset")
+      notifies :create, "ruby_block[config_replicaset]"
     end
     if type == "mongos" && node['mongodb']['auto_configure']['sharding']
       notifies :create, "ruby_block[config_sharding]", :immediately
@@ -217,6 +158,26 @@ define :mongodb_instance, :mongodb_type => "mongod",
     if name == "mongodb"
       # we don't care about a running mongodb service in these cases, all we need is stopping it
       ignore_failure true
+    end
+  end
+  
+  # replicaset
+  if !replicaset_name.nil? && node['mongodb']['auto_configure']['replicaset']
+    rs_nodes = search(
+      :node,
+      "mongodb_cluster_name:#{replicaset['mongodb']['cluster_name']} AND \
+       recipes:mongodb\\:\\:replicaset AND \
+       mongodb_shard_name:#{replicaset['mongodb']['shard_name']} AND \
+       chef_environment:#{replicaset.chef_environment}"
+    )
+  
+    ruby_block "config_replicaset" do
+      block do
+        if not replicaset.nil?
+          MongoDB.configure_replicaset(replicaset, replicaset_name, rs_nodes)
+        end
+      end
+      action :nothing
     end
   end
   
@@ -235,8 +196,8 @@ define :mongodb_instance, :mongodb_type => "mongod",
     ruby_block "config_sharding" do
       block do
         if type == "mongos"
-          Chef::MongoDB.configure_shards(node, shard_nodes)
-          Chef::MongoDB.configure_sharded_collections(node, node['mongodb']['sharded_collections'])
+          MongoDB.configure_shards(node, shard_nodes)
+          MongoDB.configure_sharded_collections(node, node['mongodb']['sharded_collections'])
         end
       end
       action :nothing
