@@ -40,7 +40,7 @@ template "/etc/monit/conf.d/matchmaker-#{application}.monitrc" do
 	mode '0644'
 	variables(
 	  :deploy => deploy,
-	  :application_name => application,
+	  :application_name => application
 
 	)
 	notifies :restart, "service[monit]", :immediately
