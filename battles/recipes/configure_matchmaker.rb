@@ -33,7 +33,7 @@ template "#{deploy[:deploy_to]}/current/matchmaker/matchmaker.cfg" do
 	)
 end
 
-template "/etc/monit/conf.d/matchmaker-#{application}.monitrc" do
+template "/etc/monit/conf.d/matchmaker.monitrc" do
 	source 'matchmaker.monitrc.erb'
 	owner 'root'
 	group 'root'
