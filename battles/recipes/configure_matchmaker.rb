@@ -21,6 +21,10 @@ end
 
 deploy = node[:deploy][:matchmaker]
 
+service 'monit' do
+	action :nothing
+end
+
 template "#{deploy[:deploy_to]}/current/matchmaker/matchmaker.cfg" do
 	source 'matchmaker.cfg.erb'
 	mode '0660'
