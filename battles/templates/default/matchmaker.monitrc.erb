@@ -1,4 +1,4 @@
 check process matchmaker matching "mono MatchMaker.exe"
-  start program = "/bin/bash -c 'cd <%= @deploy[:deploy_to] %>/current/matchmaker/; /usr/bin/mono MatchMaker.exe'"
+  start program = "/bin/bash -c 'ls; cd <%= @deploy[:deploy_to] %>/current/matchmaker/; /usr/bin/mono MatchMaker.exe'"
   stop program  = "/usr/bin/pkill -f 'mono MatchMaker.exe'"
   
