@@ -33,7 +33,7 @@ template "#{deploy[:deploy_to]}/current/matchmaker/matchmaker.cfg" do
 	)
 end
 
-template "#{node.default[:monit][:conf_dir]}/matchmaker-#{application}.monitrc" do
+template "/etc/monit/conf.d/matchmaker-#{application}.monitrc" do
 	source 'matchmaker.monitrc.erb'
 	owner 'root'
 	group 'root'
@@ -41,7 +41,7 @@ template "#{node.default[:monit][:conf_dir]}/matchmaker-#{application}.monitrc" 
 	variables(
 	  :deploy => deploy,
 	  :application_name => application,
-	  :monitored_script => "#{deploy[:deploy_to]}/current/matchmaker/MatchMaker.exe"
+
 	)
 	notifies :restart, "service[monit]", :immediately
 end
