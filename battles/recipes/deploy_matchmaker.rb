@@ -24,7 +24,8 @@ node[:deploy].each do |application, deploy|
 
   ruby_block "restart matchmaker application #{application}" do
     block do
-      Chef::Log.info("restart node.js via: #{node[:deploy][application][:matchmaker][:restart_command]}")
+	  Chef::Log.info(`cd #{deploy[:deploy_to]}/current/matchmaker;/usr/bin/mono MatchMaker.exe`)
+      #Chef::Log.info("restart node.js via: #{node[:deploy][application][:matchmaker][:restart_command]}")
     end
   end
 end
