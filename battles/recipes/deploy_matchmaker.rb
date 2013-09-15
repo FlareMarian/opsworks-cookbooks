@@ -24,10 +24,12 @@ node[:deploy].each do |application, deploy|
     deploy_data deploy
     app application
   end
+  
+  include_recipe 'battles::configure_matchmaker'
 
-  ruby_block "restart node.js application #{application}" do
+  ruby_block "restart matchmaker application #{application}" do
     block do
-      Chef::Log.info("restart node.js via: #{node[:deploy][application][:nodejs][:restart_command]}")
+      Chef::Log.info("restart node.js via: #{node[:deploy][application][:matchmaker][:restart_command]}")
     end
   end
 end
