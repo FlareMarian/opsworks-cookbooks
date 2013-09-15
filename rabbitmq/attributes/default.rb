@@ -72,7 +72,7 @@ default['rabbitmq']['enabled_users'] =
 default['rabbitmq']['disabled_users'] =[]
 
 #plugins
-default['rabbitmq']['enabled_plugins'] = []
+default['rabbitmq']['enabled_plugins'] = ['rabbitmq_management']
 default['rabbitmq']['disabled_plugins'] = []
 
 #platform specific settings
