@@ -24,7 +24,7 @@ node[:deploy].each do |application, deploy|
 
   ruby_block "restart matchmaker application #{application}" do
     block do
-      Chef::Log.info(`monit matchmaker restart`)
+      Chef::Log.info(`monit restart matchmaker`)
     end
   end
 end
