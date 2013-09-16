@@ -1,7 +1,117 @@
-check host turnserver with address 127.0.0.1
-	start program = "/bin/bash -c 'cd <%= @deploy[:deploy_to] %>/current/webnodejs/src/nodejs/; /usr/bin/env NODE_PATH=<%= @deploy[:deploy_to] %>/current/webnodejs/src/nodejs/node_modules:<%= @deploy[:deploy_to] %>/current/src/nodejs /usr/bin/node --max-stack-size=65535 -- <%= @deploy[:deploy_to] %>/current/webnodejs/src/nodejs/main.js --pidname turnserver'"
-	stop program  = "/usr/bin/pkill -f '<%= @deploy[:deploy_to] %>/current/webnodejs/src/nodejs/main.js --pidname turnserver'"
-	if failed port 80 protocol HTTP
-		request /serverinfos/
-		with timeout 60 seconds
-		then restart
+
+
+var gamename = 'battlesproto';
+
+MATCHSTATE_WAITING_FOR_PLAYERS = 1;
+MATCHSTATE_WAITING_FOR_TURN = 2;
+MATCHSTATE_FINISHED = 3;
+MATCHSTATE_DELETED = 4;
+
+MATCHMODE_NORMAL = 1; // Submission of turns only possible when all players joined
+MATCHMODE_FAST_SUBMIT = 2; // Submission of turns possible directly after creation/join
+
+
+LISTMODE_OWN_MATCHES = 1;
+LISTMODE_OPEN_MATCHES = 2;
+LISTMODE_ENDED_MATCHES = 3;
+LISTMODE_ENDED_BUT_UNACKED_MATCHES = 4;
+LISTMODE_INVITATIONS = 5;
+LISTMODE_OWN_MATCHES_RUNNING = 6;
+
+HISTORY_REGISTERED = 1;
+HISTORY_ENCASHED_RECEIPT = 2;
+HISTORY_GOT_PREMIUM_CURRENCY = 3;
+HISTORY_GOT_NORMAL_CURRENCY = 4;
+HISTORY_SPENT_PREMIUM_CURRENCY = 5;
+HISTORY_SPENT_NORMAL_CURRENCY = 6;
+HISTORY_GAME_EVENT = 7;
+HISTORY_REPORT = 8;
+AI_PLAYER_ID = "deepthought";
+
+NOT_RANKED_INDICATOR = -1;
+
+NUDGE_FIRST_TIMEOUT = 1*3600;
+NUDGE_SECOND_TIMEOUT = 22*3600; // This is longer than timeout to make sure nudging is only available once per match
+
+global.CURRENT_AI_PLAYER_IDS = [];
+
+global.SETTINGS = {
+    version:'???',
+
+	// Which port this node should listen on?
+    port:8001,
+
+	// Our unique gameid
+	gameid:gamename,
+
+
+
+
+	// The api key for the game
+	apikey : "jdne6z83zdh46we4",
+	apisecret: "f755389fd79862493fa2f71c55368006",
+	mastersecret: "d72962b74231f7bbaf9bdd3ed2356069",
+	checkhash : false,
+	checksessionid : true,
+
+
+	// MongoDB config
+    database: gamename+'_turnserver',
+    mongoip:'127.0.0.1',
+    master_database:gamename+'_turnserver',
+    master_mongoip:'127.0.0.1',
+
+	// Where to find the memcache for clusterlocking purposes
+    memcacheip:'127.0.0.1',
+	live : false,
+
+	// Where to find the rabbitmq server for messaging purposes
+	rabbitip:'127.0.0.1',
+	rabbituser:'guest',
+	rabbitpwd:'guest',
+	rabbitmq_enable_debug:true,
+
+	rccheckerip:'ReceiptCheckerV2-248155984.us-east-1.elb.amazonaws.com',
+    rccheckerport:'80',
+    rckey:'kench32jd95',
+    rcversion:'0.0',
+    rcsandbox: false,
+
+	currencyid: 'radogen',
+
+	// What matchmaking strategy to use
+	// 'local' == use local matchmaker
+	// 'remote' == use remote matchmaker
+	matchmakingstrategy : 'local',
+
+    dbg:0,
+
+	servicetype:"nodejs",
+	serviceid:"NOT_SET",
+
+    sandbox:0,
+	defaultlang : 'en',
+
+	// Enable clustering
+	// If enabled, as many nodes as cores will be started
+    cluster:false,
+
+    adminips:'',
+
+	playertable : gamename+"_players",
+	matchtable : gamename+"_matches",
+	receipttable : gamename+"_receipts",
+	apptable : gamename+"_app",
+
+	// The current game version the server expects
+	currentversion : '1.0',
+
+	initial_elo_points:1000,
+	ai_random_response_range:600,
+	ai_random_response_base:300,
+	ai_num_matches_threshold:10,
+	matches_needed_for_ranking:10,
+	elo_score_needed_for_ranking:800,
+	gcmmessagefield:'message'
+
+};
