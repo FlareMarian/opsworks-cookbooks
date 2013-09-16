@@ -45,7 +45,7 @@ template "/etc/monit/conf.d/matchmaker.monitrc" do
 	group 'root'
 	mode '0644'
 	variables(
-		:deploy => deploy
+		:deploy => deploy,
 		:serviceid => "matchmaker",
 		:exefile => "MatchMaker.exe"
 	)
