@@ -1,0 +1,4 @@
+check process <%= @serviceid %> matching "mono <%= @exefile %>"
+  start program = "/bin/bash -c 'cd <%= @deploy[:deploy_to] %>/current/<%= @serviceid %>/; /usr/bin/mono <%= @exefile %>'"
+  stop program  = "/usr/bin/pkill -f 'mono <%= @exefile %>'"
+  

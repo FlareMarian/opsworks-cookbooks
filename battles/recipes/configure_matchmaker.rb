@@ -26,11 +26,13 @@ service 'monit' do
 end
 
 template "#{deploy[:deploy_to]}/current/matchmaker/matchmaker.cfg" do
-	source 'matchmaker.cfg.erb'
+	source 'backendservice.cfg.erb'
 	mode '0660'
 	owner deploy[:user]
 	group deploy[:group]
 	variables(
+		:gameid => "battles_test",
+		:serviceid => "matchmaker",
 		:mongodbhost => mongodbhost, 
 		:memcachedhost => memcachedhost, 
 		:rabbitmqhost => rabbitmqhost
@@ -38,13 +40,14 @@ template "#{deploy[:deploy_to]}/current/matchmaker/matchmaker.cfg" do
 end
 
 template "/etc/monit/conf.d/matchmaker.monitrc" do
-	source 'matchmaker.monitrc.erb'
+	source 'backendservice.monitrc.erb'
 	owner 'root'
 	group 'root'
 	mode '0644'
 	variables(
-	  :deploy => deploy
-
+		:deploy => deploy
+		:serviceid => "matchmaker",
+		:exefile => "MatchMaker.exe"
 	)
 	notifies :restart, "service[monit]", :immediately
 end
