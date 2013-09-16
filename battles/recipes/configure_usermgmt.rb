@@ -45,7 +45,7 @@ template "/etc/monit/conf.d/usermgmt.monitrc" do
 	group 'root'
 	mode '0644'
 	variables(
-		:deploy => deploy
+		:deploy => deploy,
 		:serviceid => "usermgmt",
 		:exefile => "usermgmt.exe"
 	)
