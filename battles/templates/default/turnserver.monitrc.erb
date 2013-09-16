@@ -1,7 +1,7 @@
 check host turnserver with address 127.0.0.1
-	start program = "/bin/bash -c 'cd <%= @deploy[:deploy_to] %>/current/nodejs/src/nodejs/; /usr/bin/env NODE_PATH=<%= @deploy[:deploy_to] %>/current/nodejs/src/nodejs/node_modules:<%= @deploy[:deploy_to] %>/current/src/nodejs /usr/bin/node --max-stack-size=65535 -- <%= @deploy[:deploy_to] %>/current/nodejs/src/nodejs/main.js --pidname turnserver'"
+	start program = "/bin/bash -c 'cd <%= @deploy[:deploy_to] %>/current/nodejs/src/nodejs/; /usr/bin/env NODE_PATH=<%= @deploy[:deploy_to] %>/current/nodejs/src/nodejs/node_modules:<%= @deploy[:deploy_to] %>/current/src/nodejs /usr/local/bin/node --max-stack-size=65535 -- <%= @deploy[:deploy_to] %>/current/nodejs/src/nodejs/main.js --pidname turnserver'"
 	stop program  = "/usr/bin/pkill -f '<%= @deploy[:deploy_to] %>/current/nodejs/src/nodejs/main.js --pidname turnserver'"
 	if failed port 80 protocol HTTP
-		request /serverinfos/
+		request /ping/
 		with timeout 60 seconds
 		then restart

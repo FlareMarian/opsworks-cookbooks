@@ -1,6 +1,4 @@
-
-
-var gamename = 'battlesproto';
+var gamename = '<%= @gameid %>';
 
 MATCHSTATE_WAITING_FOR_PLAYERS = 1;
 MATCHSTATE_WAITING_FOR_TURN = 2;
@@ -57,16 +55,16 @@ global.SETTINGS = {
 
 	// MongoDB config
     database: gamename+'_turnserver',
-    mongoip:'127.0.0.1',
+    mongoip:'<%= @mongodbhost %>',
     master_database:gamename+'_turnserver',
-    master_mongoip:'127.0.0.1',
+    master_mongoip:'<%= @mongodbhost %>',
 
 	// Where to find the memcache for clusterlocking purposes
-    memcacheip:'127.0.0.1',
+    memcacheip:'<%= @memcachedhost %>',
 	live : false,
 
 	// Where to find the rabbitmq server for messaging purposes
-	rabbitip:'127.0.0.1',
+	rabbitip:'<%= @rabbitmqhost %>',
 	rabbituser:'guest',
 	rabbitpwd:'guest',
 	rabbitmq_enable_debug:true,
