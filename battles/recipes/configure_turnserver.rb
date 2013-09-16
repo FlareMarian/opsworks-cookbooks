@@ -19,13 +19,13 @@ node[:opsworks][:layers][:memcached][:instances].each do |instance_name, instanc
 	Chef::Log.info("Found Memcached instance #{instance_name} at #{instance[:private_ip]}")
 end
 
-deploy = node[:deploy][:matchmaker]
+deploy = node[:deploy][:turnserver]
 
 service 'monit' do
 	action :nothing
 end
 
-template "#{deploy[:deploy_to]}/current/webnodejs/src/nodejs/config.js" do
+template "#{deploy[:deploy_to]}/current/webnodejs/src/nodejs/conf.js" do
 	source 'turnserverconfig.js.erb'
 	mode '0660'
 	owner deploy[:user]
