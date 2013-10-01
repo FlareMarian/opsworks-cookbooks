@@ -47,7 +47,8 @@ template "/etc/monit/conf.d/usermgmt.monitrc" do
 	variables(
 		:deploy => deploy,
 		:serviceid => "usermgmt",
-		:exefile => "UserManagement.exe"
+		:exefile => "UserManagement.exe",
+		:logpath => "#{deploy[:deploy_to]}/current/log/"
 	)
 	notifies :restart, "service[monit]", :immediately
 end
