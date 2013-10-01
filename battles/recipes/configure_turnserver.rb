@@ -34,7 +34,8 @@ template "#{deploy[:deploy_to]}/current/nodejs/src/nodejs/conf.js" do
 		:gameid => "battles_test",
 		:mongodbhost => mongodbhost, 
 		:memcachedhost => memcachedhost, 
-		:rabbitmqhost => rabbitmqhost
+		:rabbitmqhost => rabbitmqhost,
+		:logpath => "#{deploy[:deploy_to]}/current/log/"
 	)
 end
 
