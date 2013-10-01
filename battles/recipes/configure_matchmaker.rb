@@ -47,7 +47,8 @@ template "/etc/monit/conf.d/matchmaker.monitrc" do
 	variables(
 		:deploy => deploy,
 		:serviceid => "matchmaker",
-		:exefile => "MatchMaker.exe"
+		:exefile => "MatchMaker.exe",
+		:logpath => "#{deploy[:deploy_to]}/current/log/"
 	)
 	notifies :restart, "service[monit]", :immediately
 end
