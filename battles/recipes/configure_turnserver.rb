@@ -35,7 +35,7 @@ template "#{deploy[:deploy_to]}/current/nodejs/src/nodejs/conf.js" do
 		:mongodbhost => mongodbhost, 
 		:memcachedhost => memcachedhost, 
 		:rabbitmqhost => rabbitmqhost,
-		:logpath => "#{deploy[:deploy_to]}/current/log/"
+		:logpath => "#{deploy[:deploy_to]}/current/log"
 	)
 end
 
